@@ -4,9 +4,16 @@
 #include <termios.h>
 #include <unistd.h>
 struct termios orig_termios;
+
+void die(const char *s) {
+  perror(s);
+  exit(1);
+}
+
 void disableRawMode() {
   tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
 }
+
 void enableRawMode() {
   tcgetattr(STDIN_FILENO, &orig_termios);
   atexit(disableRawMode);
@@ -19,6 +26,7 @@ void enableRawMode() {
   raw.c_cc[VTIME] = 1;
   tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 }
+
 int main() {
   enableRawMode();
   while (1) {
