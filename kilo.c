@@ -2,7 +2,9 @@
 #include <termios.h>
 #include <unistd.h>
 struct termios orig_termios;
-void disableRawMode() { … }
+void disableRawMode() {
+  tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
+}
 void enableRawMode() {
   tcgetattr(STDIN_FILENO, &orig_termios);
   atexit(disableRawMode);
