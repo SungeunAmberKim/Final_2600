@@ -11,6 +11,12 @@
 /*** defines ***/
 #define KILO_VERSION "0.0.1"
 #define CTRL_KEY(k) ((k) & 0x1f)
+enum editorKey {
+  ARROW_LEFT = 'a',
+  ARROW_RIGHT = 'd',
+  ARROW_UP = 'w',
+  ARROW_DOWN = 's'
+};
 /*** data ***/
 struct editorConfig {
   int cx, cy;
@@ -57,10 +63,10 @@ char editorReadKey() {
     if (read(STDIN_FILENO, &seq[1], 1) != 1) return '\x1b';
     if (seq[0] == '[') {
       switch (seq[1]) {
-        case 'A': return 'w';
-        case 'B': return 's';
-        case 'C': return 'd';
-        case 'D': return 'a';
+        case 'A': return ARROW_UP;
+        case 'B': return ARROW_DOWN;
+        case 'C': return ARROW_RIGHT;
+        case 'D': return ARROW_LEFT;
       }
     }
     return '\x1b';
@@ -116,16 +122,16 @@ void abFree(struct abuf *ab) {
 /*** input ***/
 void editorMoveCursor(char key) {
   switch (key) {
-    case 'a':
+    case ARROW_LEFT:
       E.cx--;
       break;
-    case 'd':
+    case ARROW_RIGHT:
       E.cx++;
       break;
-    case 'w':
+    case ARROW_UP:
       E.cy--;
       break;
-    case 's':
+    case ARROW_DOWN:
       E.cy++;
       break;
   }
@@ -139,10 +145,10 @@ void editorProcessKeypress() {
       write(STDOUT_FILENO, "\x1b[H", 3);
       exit(0);
       break;
-      case 'w':
-      case 's':
-      case 'a':
-      case 'd':
+    case ARROW_UP:
+    case ARROW_DOWN:
+    case ARROW_LEFT:
+    case ARROW_RIGHT:
       editorMoveCursor(c);
       break;
   }
