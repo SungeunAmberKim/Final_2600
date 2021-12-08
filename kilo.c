@@ -1,3 +1,4 @@
+/*** includes ***/
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
@@ -7,9 +8,9 @@
 
 /*** defines ***/
 #define CTRL_KEY(k) ((k) & 0x1f)
-
+/*** data ***/
 struct termios orig_termios;
-
+/*** terminal ***/
 void die(const char *s) {
   write(STDOUT_FILENO, "\x1b[2J", 4);
   write(STDOUT_FILENO, "\x1b[H", 3);
@@ -54,11 +55,21 @@ void editorProcessKeypress() {
       break;
   }
 }
-
+/*** output ***/
+void editorDrawRows() {
+  int y;
+  for (y = 0; y < 24; y++) {
+    write(STDOUT_FILENO, "~\r\n", 3);
+  }
+}
 void editorRefreshScreen() {
   write(STDOUT_FILENO, "\x1b[2J", 4);
   write(STDOUT_FILENO, "\x1b[H", 3);
+  editorDrawRows();
+  write(STDOUT_FILENO, "\x1b[H", 3);
 }
+
+/*** init ***/
 
 int main() {
   enableRawMode();
