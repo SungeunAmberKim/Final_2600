@@ -342,10 +342,9 @@ void editorDrawRows(struct abuf *ab) {
       abAppend(ab, &E.row[filerow].render[E.coloff], len);
     }
     abAppend(ab, "\x1b[K", 3);
-    if (y < E.screenrows - 1) {
-      abAppend(ab, "\r\n", 2);
+    abAppend(ab, "\r\n", 2);
     }
-  }
+  
 }
 void editorRefreshScreen() {
   editorScroll();
