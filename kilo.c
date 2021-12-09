@@ -226,6 +226,10 @@ void editorSelectSyntaxHighlight() {
       if ((is_ext && ext && !strcmp(ext, s->filematch[i])) ||
           (!is_ext && strstr(E.filename, s->filematch[i]))) {
         E.syntax = s;
+        int filerow;
+        for (filerow = 0; filerow < E.numrows; filerow++) {
+          editorUpdateSyntax(&E.row[filerow]);
+        }
         return;
       }
       i++;
@@ -381,6 +385,7 @@ char *editorRowsToString(int *buflen) {
 void editorOpen(char *filename) {
   free(E.filename);
   E.filename = strdup(filename);
+  editorSelectSyntaxHighlight();
   FILE *fp = fopen(filename, "r");
   if (!fp) die("fopen");
   char *line = NULL;
@@ -396,6 +401,7 @@ void editorOpen(char *filename) {
   fclose(fp);
   E.dirty = 0;
 }
+
 void editorSave() {
   if (E.filename == NULL) {
     E.filename = editorPrompt("Save as: %s (ESC to cancel)", NULL);
@@ -403,6 +409,7 @@ void editorSave() {
       editorSetStatusMessage("Save aborted");
       return;
     }
+    editorSelectSyntaxHighlight();
   }
   int len;
   char *buf = editorRowsToString(&len);
