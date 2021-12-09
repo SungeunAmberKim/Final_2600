@@ -175,6 +175,12 @@ void editorUpdateSyntax(erow *row) {
     }
   }
 }
+int editorSyntaxToColor(int hl) {
+  switch (hl) {
+    case HL_NUMBER: return 31;
+    default: return 37;
+  }
+}
 /*** row operations ***/
 int editorRowCxToRx(erow *row, int cx) {
   int rx = 0;
@@ -215,6 +221,7 @@ void editorUpdateRow(erow *row) {
   }
   row->render[idx] = '\0';
   row->rsize = idx;
+  editorUpdateSyntax(row);
 }
 void editorInsertRow(int at, char *s, size_t len) {
   if (at < 0 || at > E.numrows) return;
