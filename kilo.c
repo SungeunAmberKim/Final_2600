@@ -192,6 +192,14 @@ void editorAppendRow(char *s, size_t len) {
   editorUpdateRow(&E.row[at]);
   E.numrows++;
 }
+void editorRowInsertChar(erow *row, int at, int c) {
+  if (at < 0 || at > row->size) at = row->size;
+  row->chars = realloc(row->chars, row->size + 2);
+  memmove(&row->chars[at + 1], &row->chars[at], row->size - at + 1);
+  row->size++;
+  row->chars[at] = c;
+  editorUpdateRow(row);
+}
 /*** file i/o ***/
 void editorOpen(char *filename) {
   free(E.filename);
@@ -375,6 +383,13 @@ void editorDrawStatusBar(struct abuf *ab) {
   abAppend(ab, "\x1b[m", 3);
   abAppend(ab, "\r\n", 2);
 }
+void editorDrawMessageBar(struct abuf *ab) {
+  abAppend(ab, "\x1b[K", 3);
+  int msglen = strlen(E.statusmsg);
+  if (msglen > E.screencols) msglen = E.screencols;
+  if (msglen && time(NULL) - E.statusmsg_time < 5)
+    abAppend(ab, E.statusmsg, msglen);
+}
 void editorRefreshScreen() {
   editorScroll();
   struct abuf ab = ABUF_INIT;
@@ -382,6 +397,7 @@ void editorRefreshScreen() {
   abAppend(&ab, "\x1b[H", 3);
   editorDrawRows(&ab);
   editorDrawStatusBar(&ab);
+  editorDrawMessageBar(&ab);
   char buf[32];
   snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1,
                                             (E.rx - E.coloff) + 1);
